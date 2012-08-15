@@ -1,0 +1,29 @@
+Overview
+--------
+
+libugpio is a free software library to ease the use of linux kernel's sysfs
+gpio interface from C programs and/or other libraries. The basic function
+set is derived from the kernel internal gpio api.
+
+The license of libugpio is LGPL v2.1 and the licence of programs in
+tests directory is GPL v3.
+
+The documentation is available under the Creative Commons Attribution-ShareAlike
+License 3.0 (Unported) (http://creativecommons.org/licenses/by-sa/3.0/).
+
+The library is written in C and designed to run on Linux.
+
+
+Installation
+------------
+
+The shell commands are ``./autogen.sh; ./configure; make; make install``.
+
+
+Report a Bug
+------------
+
+To report a bug, you can:
+ * fill a bug report on the issue tracker
+   http://github.com/mhei/libugpio/issues
+ * or send an email to mhei@heimpold.de
