@@ -25,7 +25,7 @@ libugpio_la_SOURCES = \
 libugpio_la_LDFLAGS = $(AM_LDFLAGS) -version-info $(LIBUGPIO_LT_VERSION_INFO) \
                       -no-undefined -export-dynamic
 
-libugpioincludedir = $(includedir)/upgio
+libugpioincludedir = $(includedir)/ugpio
 libugpioinclude_HEADERS = ugpio.h ugpio-version.h
 
 DISTCLEANFILES = ugpio-version.h
