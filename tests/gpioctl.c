@@ -33,7 +33,7 @@ void print_usage(void)
 int main(int argc, char *argv[])
 {
 	unsigned int gpio_pin;
-	int rv;
+	int rq, rv;
 
 	if (argc != 3)
 	{
@@ -43,10 +43,18 @@ int main(int argc, char *argv[])
 	gpio_pin = atoi(argv[2]);
 	printf("Using gpio pin %u.\n", gpio_pin);
 
-	if ((rv = gpio_request(gpio_pin, NULL)) < 0)
+	if ((rq = gpio_is_requested(gpio_pin)) < 0)
 	{
-		perror("gpio_request");
+		perror("gpio_is_requested");
 		return EXIT_FAILURE;
+	}
+
+	if (!rq) {
+		if ((rv = gpio_request(gpio_pin, NULL)) < 0)
+		{
+			perror("gpio_request");
+			return EXIT_FAILURE;
+		}
 	}
 
 	if (!strcmp(argv[1], "dirin"))
@@ -83,9 +91,11 @@ int main(int argc, char *argv[])
 		}
 	} else print_usage();
 
-	if (gpio_free(gpio_pin) < 0)
-	{
-		perror("gpio_free");
+	if (!rq) {
+		if (gpio_free(gpio_pin) < 0)
+		{
+			perror("gpio_free");
+		}
 	}
 
 	return (rv < 0) ? EXIT_FAILURE : EXIT_SUCCESS;
