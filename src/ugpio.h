@@ -59,6 +59,7 @@ inline int gpio_is_valid(unsigned int gpio)
 	return 1;
 }
 
+extern int gpio_is_requested(unsigned int gpio);
 extern int gpio_request(unsigned int gpio, const char *label);
 extern int gpio_request_one(unsigned int gpio, unsigned long flags, const char *label);
 extern int gpio_request_array(const struct gpio *array, size_t num);

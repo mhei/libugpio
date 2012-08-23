@@ -48,6 +48,18 @@ static int gpio_write_value(const char *pathname, const char *buf, size_t count)
     return close(fd);
 }
 
+int gpio_is_requested(unsigned int gpio)
+{
+    int rv;
+    char pathname[255];
+    snprintf(pathname, sizeof(pathname), GPIO_VALUE, gpio);
+
+    if ((rv = access(pathname, R_OK)) == -1)
+        return -1;
+
+    return (rv == 0);
+}
+
 int gpio_request(unsigned int gpio, const char *label)
 {
     char buffer[16];
