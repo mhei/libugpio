@@ -113,7 +113,7 @@ int gpio_get_direction(unsigned int gpio)
 
     snprintf(pathname, sizeof(pathname), GPIO_DIRECTION, gpio);
 
-    if (gpio_read_value(pathname, buffer, sizeof(buffer)) == -1)
+    if (gpio_read_value(pathname, &buffer, sizeof(buffer)) == -1)
         return -1;
 
     return (buffer == 'i') ? GPIOF_DIR_IN : GPIOF_DIR_OUT;
@@ -142,7 +142,7 @@ int gpio_get_activelow(unsigned int gpio)
 
     snprintf(pathname, sizeof(pathname), GPIO_ACTIVELOW, gpio);
 
-    if (gpio_read_value(pathname, buffer, sizeof(buffer)) == -1)
+    if (gpio_read_value(pathname, &buffer, sizeof(buffer)) == -1)
         return -1;
 
     return buffer - '0';
@@ -162,7 +162,7 @@ int gpio_get_value(unsigned int gpio)
 
     snprintf(pathname, sizeof(pathname), GPIO_VALUE, gpio);
 
-    if (gpio_read_value(pathname, buffer, sizeof(buffer)) == -1)
+    if (gpio_read_value(pathname, &buffer, sizeof(buffer)) == -1)
         return -1;
 
     return buffer - '0';
