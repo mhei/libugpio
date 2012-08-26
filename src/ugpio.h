@@ -69,10 +69,22 @@ extern int gpio_request_one(unsigned int gpio, unsigned int flags, const char *l
 extern int gpio_request_array(const struct gpio *array, size_t num);
 extern int gpio_free(unsigned int gpio);
 extern void gpio_free_array(const struct gpio *array, size_t num);
+
+extern int gpio_alterable_direction(unsigned int gpio);
+extern int gpio_get_direction(unsigned int gpio);
 extern int gpio_direction_input(unsigned int gpio);
 extern int gpio_direction_output(unsigned int gpio, int value);
+
+extern int gpio_get_activelow(unsigned int gpio);
+extern int gpio_set_activelow(unsigned int gpio, int value);
+
 extern int gpio_get_value(unsigned int gpio);
 extern int gpio_set_value(unsigned int gpio, int value);
+
+extern int gpio_alterable_edge(unsigned int gpio);
+extern int gpio_set_edge_str(unsigned int gpio, const char *edge);
+extern int gpio_set_edge(unsigned int gpio, unsigned int flags);
+extern int gpio_get_edge(unsigned int gpio);
 
 inline int gpio_cansleep(unsigned int gpio)
 {
