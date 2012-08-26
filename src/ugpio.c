@@ -26,12 +26,15 @@
 #include <config.h>
 #include <ugpio.h>
 
+#define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
+
 #define GPIO_ROOT "/sys/class/gpio"
 #define GPIO_EXPORT    GPIO_ROOT "/export"
 #define GPIO_UNEXPORT  GPIO_ROOT "/unexport"
 #define GPIO_DIRECTION GPIO_ROOT "/gpio%d/direction"
 #define GPIO_ACTIVELOW GPIO_ROOT "/gpio%d/active_low"
 #define GPIO_VALUE     GPIO_ROOT "/gpio%d/value"
+#define GPIO_EDGE      GPIO_ROOT "/gpio%d/edge"
 
 static int gpio_write_value(const char *pathname, const char *buf, size_t count)
 {
@@ -48,16 +51,40 @@ static int gpio_write_value(const char *pathname, const char *buf, size_t count)
     return close(fd);
 }
 
-int gpio_is_requested(unsigned int gpio)
+static ssize_t gpio_read_value(const char *pathname, char *buf, size_t count)
+{
+    int fd;
+    ssize_t c;
+
+    if ((fd = open(pathname, O_RDONLY)) == -1)
+        return -1;
+
+    if ((c = read(fd, buf, count)) == -1) {
+        close(fd);
+        return -1;
+    }
+
+    if (close(fd) == -1)
+        return -1;
+
+    return c;
+}
+
+static int gpio_check(unsigned int gpio, const char *key)
 {
     int rv;
     char pathname[255];
-    snprintf(pathname, sizeof(pathname), GPIO_VALUE, gpio);
+    snprintf(pathname, sizeof(pathname), key, gpio);
 
     if ((rv = access(pathname, R_OK)) == -1)
         return -1;
 
     return (rv == 0);
+}
+
+int gpio_is_requested(unsigned int gpio)
+{
+    return gpio_check(gpio, GPIO_VALUE);
 }
 
 int gpio_request(unsigned int gpio, const char *label)
@@ -72,6 +99,33 @@ int gpio_free(unsigned int gpio)
     char buffer[16];
     snprintf(buffer, sizeof(buffer), "%d\n", gpio);
     return gpio_write_value(GPIO_UNEXPORT, buffer, strlen(buffer));
+}
+
+int gpio_alterable_direction(unsigned int gpio)
+{
+    return gpio_check(gpio, GPIO_DIRECTION);
+}
+
+int gpio_get_direction(unsigned int gpio)
+{
+    int fd;
+    char pathname[255];
+    char buffer;
+
+    snprintf(pathname, sizeof(pathname), GPIO_DIRECTION, gpio);
+
+    if ((fd = open(pathname, O_RDONLY)) == -1)
+        return -1;
+
+    if (read(fd, &buffer, sizeof(buffer)) != sizeof(buffer)) {
+        close(fd);
+        return -1;
+    }
+
+    if (close(fd) == -1)
+        return -1;
+
+    return (buffer == 'i') ? GPIOF_DIR_IN : GPIOF_DIR_OUT;
 }
 
 int gpio_direction_input(unsigned int gpio)
@@ -121,21 +175,31 @@ int gpio_set_value(unsigned int gpio, int value)
 
 int gpio_request_one(unsigned int gpio, unsigned long flags, const char *label)
 {
-    int err;
+    int rv;
 
-    err = gpio_request(gpio, label);
-    if (err)
-        return err;
+    rv = gpio_request(gpio, label);
+    if (rv)
+        return rv;
 
     if (flags & GPIOF_DIR_IN)
-        err = gpio_direction_input(gpio);
+        rv = gpio_direction_input(gpio);
     else
-        err = gpio_direction_output(gpio, (flags & GPIOF_INIT_HIGH) ? 1 : 0);
+        rv = gpio_direction_output(gpio, (flags & GPIOF_INIT_HIGH) ? 1 : 0);
 
-    if (err)
+    if (rv)
+        goto err_free;
+
+    if ((rv = gpio_alterable_edge(gpio)) < 0)
+        goto err_free;
+
+    if (rv)
+        rv = gpio_set_edge(gpio, flags);
+
+  err_free:
+    if (rv)
         gpio_free(gpio);
 
-    return err;
+    return rv;
 }
 
 int gpio_request_array(const struct gpio *array, size_t num)
@@ -161,4 +225,55 @@ void gpio_free_array(const struct gpio *array, size_t num)
 {
     while (num--)
         gpio_free((array++)->gpio);
+}
+
+int gpio_alterable_edge(unsigned int gpio)
+{
+    return gpio_check(gpio, GPIO_EDGE);
+}
+
+int gpio_set_edge_str(unsigned int gpio, const char *edge)
+{
+    char pathname[255];
+    snprintf(pathname, sizeof(pathname), GPIO_EDGE, gpio);
+    return gpio_write_value(pathname, edge, strlen(edge) + 1);
+}
+
+static const struct {
+    const char *name;
+    unsigned long flags;
+} trigger_types[] = {
+    { "none",    0 },
+    { "falling", GPIOF_TRIG_FALL },
+    { "rising",  GPIOF_TRIG_RISE },
+    { "both",    GPIOF_TRIG_FALL | GPIOF_TRIG_RISE },
+};
+
+int gpio_set_edge(unsigned int gpio, unsigned long flags)
+{
+    int i;
+
+    for (i = 0; i < ARRAY_SIZE(trigger_types); i++)
+        if ((flags & GPIOF_TRIGGER_MASK) == trigger_types[i].flags)
+            break;
+
+    return gpio_set_edge_str(gpio, trigger_types[i].name);
+}
+
+int gpio_get_edge(unsigned int gpio)
+{
+    char pathname[255];
+    char buffer[16];
+    int i;
+
+    snprintf(pathname, sizeof(pathname), GPIO_EDGE, gpio);
+
+    if (gpio_read_value(pathname, buffer, sizeof(buffer)) == -1)
+        return -1;
+
+    for (i = 0; i < ARRAY_SIZE(trigger_types); i++)
+        if (strncmp(buffer, trigger_types[i].name, strlen(trigger_types[i].name)) == 0)
+             break;
+
+    return trigger_types[i].flags;
 }

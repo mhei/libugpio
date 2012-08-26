@@ -42,6 +42,10 @@ UGPIO_BEGIN_DECLS
 #define GPIOF_OUT_INIT_LOW      (GPIOF_DIR_OUT | GPIOF_INIT_LOW)
 #define GPIOF_OUT_INIT_HIGH     (GPIOF_DIR_OUT | GPIOF_INIT_HIGH)
 
+#define GPIOF_TRIG_FALL (1 << 2)
+#define GPIOF_TRIG_RISE (1 << 3)
+#define GPIOF_TRIGGER_MASK (GPIOF_TRIG_FALL | GPIOF_TRIG_RISE)
+
 /**
  * struct gpio - a structure describing a GPIO with configuration
  * @gpio:       the GPIO number
