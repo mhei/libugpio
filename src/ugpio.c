@@ -173,7 +173,7 @@ int gpio_set_value(unsigned int gpio, int value)
     return gpio_write_value(pathname, value ? "1" : "0", 2);
 }
 
-int gpio_request_one(unsigned int gpio, unsigned long flags, const char *label)
+int gpio_request_one(unsigned int gpio, unsigned int flags, const char *label)
 {
     int rv;
 
@@ -241,7 +241,7 @@ int gpio_set_edge_str(unsigned int gpio, const char *edge)
 
 static const struct {
     const char *name;
-    unsigned long flags;
+    unsigned int flags;
 } trigger_types[] = {
     { "none",    0 },
     { "falling", GPIOF_TRIG_FALL },
@@ -249,7 +249,7 @@ static const struct {
     { "both",    GPIOF_TRIG_FALL | GPIOF_TRIG_RISE },
 };
 
-int gpio_set_edge(unsigned int gpio, unsigned long flags)
+int gpio_set_edge(unsigned int gpio, unsigned int flags)
 {
     int i;
 

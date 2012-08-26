@@ -54,7 +54,7 @@ UGPIO_BEGIN_DECLS
  */
 struct gpio {
 	unsigned int  gpio;
-	unsigned long flags;
+	unsigned int  flags;
 	const char    *label;
 };
 
@@ -65,7 +65,7 @@ inline int gpio_is_valid(unsigned int gpio)
 
 extern int gpio_is_requested(unsigned int gpio);
 extern int gpio_request(unsigned int gpio, const char *label);
-extern int gpio_request_one(unsigned int gpio, unsigned long flags, const char *label);
+extern int gpio_request_one(unsigned int gpio, unsigned int flags, const char *label);
 extern int gpio_request_array(const struct gpio *array, size_t num);
 extern int gpio_free(unsigned int gpio);
 extern void gpio_free_array(const struct gpio *array, size_t num);
