@@ -144,6 +144,26 @@ int gpio_direction_output(unsigned int gpio, int value)
     return gpio_write_value(pathname, val, strlen(val) + 1);
 }
 
+int gpio_get_activelow(unsigned int gpio)
+{
+    char pathname[255];
+    char buffer;
+
+    snprintf(pathname, sizeof(pathname), GPIO_ACTIVELOW, gpio);
+
+    if (gpio_read_value(pathname, buffer, sizeof(buffer)) == -1)
+        return -1;
+
+    return buffer - '0';
+}
+
+int gpio_set_activelow(unsigned int gpio, int value)
+{
+    char pathname[255];
+    snprintf(pathname, sizeof(pathname), GPIO_ACTIVELOW, gpio);
+    return gpio_write_value(pathname, value ? "1" : "0", 2);
+}
+
 int gpio_get_value(unsigned int gpio)
 {
     int fd;
