@@ -108,21 +108,12 @@ int gpio_alterable_direction(unsigned int gpio)
 
 int gpio_get_direction(unsigned int gpio)
 {
-    int fd;
     char pathname[255];
     char buffer;
 
     snprintf(pathname, sizeof(pathname), GPIO_DIRECTION, gpio);
 
-    if ((fd = open(pathname, O_RDONLY)) == -1)
-        return -1;
-
-    if (read(fd, &buffer, sizeof(buffer)) != sizeof(buffer)) {
-        close(fd);
-        return -1;
-    }
-
-    if (close(fd) == -1)
+    if (gpio_read_value(pathname, buffer, sizeof(buffer)) == -1)
         return -1;
 
     return (buffer == 'i') ? GPIOF_DIR_IN : GPIOF_DIR_OUT;
@@ -166,21 +157,12 @@ int gpio_set_activelow(unsigned int gpio, int value)
 
 int gpio_get_value(unsigned int gpio)
 {
-    int fd;
     char pathname[255];
     char buffer;
 
     snprintf(pathname, sizeof(pathname), GPIO_VALUE, gpio);
 
-    if ((fd = open(pathname, O_RDONLY)) == -1)
-        return -1;
-
-    if (read(fd, &buffer, sizeof(buffer)) != sizeof(buffer)) {
-        close(fd);
-        return -1;
-    }
-
-    if (close(fd) == -1)
+    if (gpio_read_value(pathname, buffer, sizeof(buffer)) == -1)
         return -1;
 
     return buffer - '0';
