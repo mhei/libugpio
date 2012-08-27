@@ -33,7 +33,7 @@ void print_usage(void)
 int main(int argc, char *argv[])
 {
 	unsigned int gpio_pin;
-	int rq, rv;
+	int rq, al, rv;
 
 	if (argc != 3)
 	{
@@ -57,6 +57,12 @@ int main(int argc, char *argv[])
 		}
 	}
 
+	if ((al = gpio_get_activelow(gpio_pin)) < 0)
+	{
+		perror("gpio_get_activelow");
+		goto err_out;
+	}
+
 	if (!strcmp(argv[1], "dirin"))
 	{
 		if (rv = gpio_direction_input(gpio_pin) < 0)
@@ -75,22 +81,23 @@ int main(int argc, char *argv[])
 		{
 			perror("gpio_get_value");
 		} else {
-			printf("Pin %u is %s\n", gpio_pin, (rv ? "HIGH" : "LOW"));
+			printf("Pin %u is %s\n", gpio_pin, (al ? !rv : rv) ? "HIGH" : "LOW");
 		}
 	} else if (!strcmp(argv[1], "set"))
 	{
-		if (rv = gpio_set_value(gpio_pin, 1) < 0)
+		if (rv = gpio_set_value(gpio_pin, al ? 0 : 1) < 0)
 		{
 			perror("gpio_set_value");
 		}
 	} else if (!strcmp(argv[1], "clear"))
 	{
-		if (rv = gpio_set_value(gpio_pin, 0) < 0)
+		if (rv = gpio_set_value(gpio_pin, al ? 1 : 0) < 0)
 		{
 			perror("gpio_set_value");
 		}
 	} else print_usage();
 
+err_out:
 	if (!rq) {
 		if (gpio_free(gpio_pin) < 0)
 		{
