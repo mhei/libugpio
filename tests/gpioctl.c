@@ -21,8 +21,8 @@
 #include <stdint.h>
 #include <string.h>
 
-#include <ugpio.h>
 #include <config.h>
+#include <ugpio.h>
 
 void print_usage(void)
 {

@@ -46,23 +46,26 @@ UGPIO_BEGIN_DECLS
 #define GPIOF_TRIG_RISE (1 << 3)
 #define GPIOF_TRIGGER_MASK (GPIOF_TRIG_FALL | GPIOF_TRIG_RISE)
 
+#define GPIOF_REQUESTED (1 << 4)
+
 /**
- * struct gpio - a structure describing a GPIO with configuration
- * @gpio:       the GPIO number
- * @flags:      GPIO configuration as specified by GPIOF_*
- * @label:      a literal description string of this GPIO
+ * A structure describing a GPIO with configuration.
  */
 struct gpio {
+	/* the GPIO number */
 	unsigned int  gpio;
+	/* GPIO configuration as specified by GPIOF_* */
 	unsigned int  flags;
+	/* file descriptor of /sys/class/gpio/gpioXY/value */
+	int fd;
+	/* a literal description string of this GPIO */
 	const char    *label;
 };
+typedef struct gpio ugpio_t;
 
-inline int gpio_is_valid(unsigned int gpio)
-{
-	return 1;
-}
-
+/**
+ * Low level API
+ */
 extern int gpio_is_requested(unsigned int gpio);
 extern int gpio_request(unsigned int gpio, const char *label);
 extern int gpio_request_one(unsigned int gpio, unsigned int flags, const char *label);
@@ -86,13 +89,16 @@ extern int gpio_set_edge_str(unsigned int gpio, const char *edge);
 extern int gpio_set_edge(unsigned int gpio, unsigned int flags);
 extern int gpio_get_edge(unsigned int gpio);
 
-inline int gpio_cansleep(unsigned int gpio)
-{
-	return 1;
-}
-
-#define gpio_get_value_cansleep gpio_get_value
-#define gpio_set_value_cansleep gpio_set_value
+/**
+ * Higher level API
+ */
+extern ugpio_t *ugpio_request_one(unsigned int gpio, unsigned int flags, const char *label);
+extern void ugpio_free(ugpio_t *ctx);
+extern int ugpio_open(ugpio_t *ctx);
+extern void ugpio_close(ugpio_t *ctx);
+extern int ugpio_fd(ugpio_t *ctx);
+extern int ugpio_get_value(ugpio_t *ctx);
+extern int ugpio_set_value(ugpio_t *ctx, int value);
 
 UGPIO_END_DECLS
 

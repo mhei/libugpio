@@ -19,7 +19,9 @@
 lib_LTLIBRARIES = libugpio.la
 libugpio_la_SOURCES = \
         ugpio.c \
+        gpio.c \
         ugpio.h \
+        ugpio-internal.h \
         ugpio-version.h
 
 libugpio_la_LDFLAGS = $(AM_LDFLAGS) -version-info $(LIBUGPIO_LT_VERSION_INFO) \
