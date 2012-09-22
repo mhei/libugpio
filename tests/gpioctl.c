@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
 		{
 			perror("gpio_get_value");
 		} else {
-			printf("Pin %u is %s\n", gpio_pin, (al ? !rv : rv) ? "HIGH" : "LOW");
+			printf("Pin %u is %s\n", gpio_pin, (al != rv) ? "HIGH" : "LOW");
 		}
 	} else if (!strcmp(argv[1], "set"))
 	{
