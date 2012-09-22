@@ -65,19 +65,19 @@ int main(int argc, char *argv[])
 
 	if (!strcmp(argv[1], "dirin"))
 	{
-		if (rv = gpio_direction_input(gpio_pin) < 0)
+		if ((rv = gpio_direction_input(gpio_pin)) < 0)
 		{
 			perror("gpio_direction_input");
 		}
 	} else if (!strcmp(argv[1], "dirout"))
 	{
-		if (rv = gpio_direction_output(gpio_pin, GPIOF_INIT_LOW) < 0)
+		if ((rv = gpio_direction_output(gpio_pin, GPIOF_INIT_LOW)) < 0)
 		{
 			perror("gpio_direction_output");
 		}
 	} else if (!strcmp(argv[1], "get"))
 	{
-		if (rv = gpio_get_value(gpio_pin) < 0)
+		if ((rv = gpio_get_value(gpio_pin)) < 0)
 		{
 			perror("gpio_get_value");
 		} else {
@@ -85,13 +85,13 @@ int main(int argc, char *argv[])
 		}
 	} else if (!strcmp(argv[1], "set"))
 	{
-		if (rv = gpio_set_value(gpio_pin, al ? 0 : 1) < 0)
+		if ((rv = gpio_set_value(gpio_pin, al ? 0 : 1)) < 0)
 		{
 			perror("gpio_set_value");
 		}
 	} else if (!strcmp(argv[1], "clear"))
 	{
-		if (rv = gpio_set_value(gpio_pin, al ? 1 : 0) < 0)
+		if ((rv = gpio_set_value(gpio_pin, al ? 1 : 0)) < 0)
 		{
 			perror("gpio_set_value");
 		}
