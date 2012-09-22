@@ -19,6 +19,7 @@
 #ifndef _UGPIO_H_
 #define _UGPIO_H_
 
+#include <stddef.h>
 #include "ugpio-version.h"
 
 #ifdef  __cplusplus
