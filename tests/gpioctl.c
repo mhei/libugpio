@@ -26,7 +26,7 @@
 
 void print_usage(void)
 {
-	printf("gpioctl dirin|dirout|get|set|clear gpio\n");
+	printf("gpioctl dirin|dirout|dirout-low|dirout-high|get|set|clear gpio\n");
 	exit(EXIT_SUCCESS);
 }
 
@@ -69,9 +69,15 @@ int main(int argc, char *argv[])
 		{
 			perror("gpio_direction_input");
 		}
-	} else if (!strcmp(argv[1], "dirout"))
+	} else if (!strcmp(argv[1], "dirout") || !strcmp(argv[1], "dirout-low"))
 	{
 		if ((rv = gpio_direction_output(gpio_pin, GPIOF_INIT_LOW)) < 0)
+		{
+			perror("gpio_direction_output");
+		}
+	} else if (!strcmp(argv[1], "dirout-high"))
+	{
+		if ((rv = gpio_direction_output(gpio_pin, GPIOF_INIT_HIGH)) < 0)
 		{
 			perror("gpio_direction_output");
 		}
