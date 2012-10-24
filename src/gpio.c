@@ -22,6 +22,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdio.h>
+#include <errno.h>
 
 #include <config.h>
 #include <ugpio.h>
@@ -63,14 +64,24 @@ static ssize_t gpio_read_value(const char *pathname, char *buf, size_t count)
 
 static int gpio_check(unsigned int gpio, const char *key)
 {
-    int rv;
+    int fd;
     char pathname[255];
     snprintf(pathname, sizeof(pathname), key, gpio);
 
-    if ((rv = access(pathname, R_OK)) == -1)
+    fd = open(pathname, O_RDONLY | O_CLOEXEC);
+
+    /* file does not exist */
+    if (fd == -1 && errno == ENOENT)
+        return 0;
+
+    /* an unexpected error occured */
+    if (fd == -1)
         return -1;
 
-    return (rv == 0);
+    /* file exists, so cleanup */
+    close(fd);
+
+    return 1;
 }
 
 int gpio_is_requested(unsigned int gpio)
