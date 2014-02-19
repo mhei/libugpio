@@ -7,4 +7,4 @@ Name: @PACKAGE@
 Description: @PACKAGE_DESCRIPTION@
 Version: @PACKAGE_VERSION@
 Libs: -L${libdir} -lugpio
-Cflags: -I${includedir}/libugpio
+Cflags: -I${includedir}/ugpio
