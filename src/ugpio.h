@@ -47,6 +47,12 @@ struct gpio {
 	unsigned int flags;
 	/* file descriptor of /sys/class/gpio/gpioXY/value */
 	int fd_value;
+	/* file descriptor of /sys/class/gpio/gpioXY/active_low */
+	int fd_active_low;
+	/* file descriptor of /sys/class/gpio/gpioXY/direction */
+	int fd_direction;
+	/* file descriptor of /sys/class/gpio/gpioXY/edge */
+	int fd_edge;
 	/* a literal description string of this GPIO */
 	const char *label;
 };
@@ -80,13 +86,83 @@ int gpio_get_edge(unsigned int gpio);
 
 /**
  * Higher level API
+ *
+ * Each GPIO is handled within a GPIO context object. Such an object encapsulates
+ * all functions which can be run on a GPIO. First, you have to create such an
+ * object using ugpio_request_one. Before you actually can use it, you have to
+ * call ugpio_open. After usage, close the object with ugpio_close and free up
+ * the used ressources with ugpio_free.
+ */
+
+/**
+ * Request a GPIO context.
+ *
+ * @param gpio the GPIO number to request
+ * @param flags a combination of or-ed GPIOF_* constants
+ * @param label an optional label for this GPIO
+ * @return returns a ugpio_t object on success, NULL otherwise
  */
 ugpio_t *ugpio_request_one(unsigned int gpio, unsigned int flags, const char *label);
+
+/**
+ * Release/free a GPIO context.
+ *
+ * @param ctx a GPIO context
+ */
 void ugpio_free(ugpio_t *ctx);
+
+/**
+ * Open the GPIO.
+ *
+ * This opens /sys/class/gpio/gpioXY/value file, but not the other file handles.
+ *
+ * @param ctx a GPIO context
+ */
 int ugpio_open(ugpio_t *ctx);
+
+/**
+ * Close the GPIO.
+ *
+ * This closes all open file handles of the GPIO context.
+ *
+ * @param ctx a GPIO context
+ */
 void ugpio_close(ugpio_t *ctx);
+
+/**
+ * Return the GPIO context's value file descriptor.
+ *
+ * Using this function the application can feed the file descriptor into it's
+ * select/poll... loop to monitor it for events.
+ *
+ * @param ctx a GPIO context
+ * @return the file descriptor of the opened value file of the GPIO
+ */
 int ugpio_fd(ugpio_t *ctx);
+
+/**
+ * Get the GPIO context's current value.
+ *
+ * Read the current GPIO pin level which is 0 or 1. Usually this corresponds
+ * to physical LOW and HIGH levels, but depends on 'active low' configuration
+ * of the GPIO.
+ *
+ * @param ctx a GPIO context
+ * @return 0 or 1 on success, -1 on error with errno set appropriately
+ */
 int ugpio_get_value(ugpio_t *ctx);
+
+/**
+ * Set the GPIO context's current value.
+ *
+ * Giving a value of 0 normally forces a LOW on the GPIO pin, whereas a value
+ * of 1 sets the GPIO to HIGH. But note, that if the GPIO is configured as
+ * 'active low' then the logic is reversed.
+ *
+ * @param ctx a GPIO context
+ * @param value the value to set
+ * @return 0 on success, -1 on error with errno set appropriately
+ */
 int ugpio_set_value(ugpio_t *ctx, int value);
 
 UGPIO_END_DECLS
