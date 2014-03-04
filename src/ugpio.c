@@ -39,7 +39,7 @@ ugpio_t *ugpio_request_one(unsigned int gpio, unsigned int flags, const char *la
     ctx->gpio = gpio;
     ctx->flags = flags;
     ctx->label = label;
-    ctx->fd = -1;
+    ctx->fd_value = -1;
 
     if ((is_requested = gpio_is_requested(ctx->gpio)) < 0)
         goto error_free;
@@ -71,8 +71,8 @@ void ugpio_free(ugpio_t *ctx)
 
 int ugpio_open(ugpio_t *ctx)
 {
-    ctx->fd = ugpio_fd_open(ctx->gpio, ctx->flags & GPIOF_DIR_IN);
-    return ctx->fd;
+    ctx->fd_value = ugpio_fd_open(ctx->gpio, ctx->flags & GPIOF_DIR_IN);
+    return ctx->fd_value;
 }
 
 void ugpio_close(ugpio_t *ctx)
@@ -80,16 +80,16 @@ void ugpio_close(ugpio_t *ctx)
     if (ctx == NULL)
         return;
 
-    if (ctx->fd == -1)
+    if (ctx->fd_value == -1)
         return;
 
-    ugpio_fd_close(ctx->fd);
-    ctx->fd = -1;
+    ugpio_fd_close(ctx->fd_value);
+    ctx->fd_value = -1;
 }
 
 int ugpio_fd(ugpio_t *ctx)
 {
-    return ctx->fd;
+    return ctx->fd_value;
 }
 
 int ugpio_get_value(ugpio_t *ctx)
@@ -98,10 +98,10 @@ int ugpio_get_value(ugpio_t *ctx)
     ssize_t c;
     off_t o;
 
-    if ((o = lseek(ctx->fd, 0, SEEK_SET)) == -1)
+    if ((o = lseek(ctx->fd_value, 0, SEEK_SET)) == -1)
         return -1;
 
-    if ((c = read(ctx->fd, &buffer, sizeof(buffer))) == -1)
+    if ((c = read(ctx->fd_value, &buffer, sizeof(buffer))) == -1)
         return -1;
 
     return buffer - '0';
@@ -111,7 +111,7 @@ int ugpio_set_value(ugpio_t *ctx, int value)
 {
     ssize_t c;
 
-    c = write(ctx->fd, value ? "1" : "0", 2);
+    c = write(ctx->fd_value, value ? "1" : "0", 2);
 
     return (c != 2) ? -1 : 0;
 }

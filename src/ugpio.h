@@ -46,7 +46,7 @@ struct gpio {
 	/* GPIO configuration as specified by GPIOF_* */
 	unsigned int flags;
 	/* file descriptor of /sys/class/gpio/gpioXY/value */
-	int fd;
+	int fd_value;
 	/* a literal description string of this GPIO */
 	const char *label;
 };
