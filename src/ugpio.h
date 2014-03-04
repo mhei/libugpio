@@ -55,39 +55,39 @@ typedef struct gpio ugpio_t;
 /**
  * Low level API
  */
-extern int gpio_is_requested(unsigned int gpio);
-extern int gpio_request(unsigned int gpio, const char *label);
-extern int gpio_request_one(unsigned int gpio, unsigned int flags, const char *label);
-extern int gpio_request_array(const struct gpio *array, size_t num);
-extern int gpio_free(unsigned int gpio);
-extern void gpio_free_array(const struct gpio *array, size_t num);
+int gpio_is_requested(unsigned int gpio);
+int gpio_request(unsigned int gpio, const char *label);
+int gpio_request_one(unsigned int gpio, unsigned int flags, const char *label);
+int gpio_request_array(const struct gpio *array, size_t num);
+int gpio_free(unsigned int gpio);
+void gpio_free_array(const struct gpio *array, size_t num);
 
-extern int gpio_alterable_direction(unsigned int gpio);
-extern int gpio_get_direction(unsigned int gpio);
-extern int gpio_direction_input(unsigned int gpio);
-extern int gpio_direction_output(unsigned int gpio, int value);
+int gpio_alterable_direction(unsigned int gpio);
+int gpio_get_direction(unsigned int gpio);
+int gpio_direction_input(unsigned int gpio);
+int gpio_direction_output(unsigned int gpio, int value);
 
-extern int gpio_get_activelow(unsigned int gpio);
-extern int gpio_set_activelow(unsigned int gpio, int value);
+int gpio_get_activelow(unsigned int gpio);
+int gpio_set_activelow(unsigned int gpio, int value);
 
-extern int gpio_get_value(unsigned int gpio);
-extern int gpio_set_value(unsigned int gpio, int value);
+int gpio_get_value(unsigned int gpio);
+int gpio_set_value(unsigned int gpio, int value);
 
-extern int gpio_alterable_edge(unsigned int gpio);
-extern int gpio_set_edge_str(unsigned int gpio, const char *edge);
-extern int gpio_set_edge(unsigned int gpio, unsigned int flags);
-extern int gpio_get_edge(unsigned int gpio);
+int gpio_alterable_edge(unsigned int gpio);
+int gpio_set_edge_str(unsigned int gpio, const char *edge);
+int gpio_set_edge(unsigned int gpio, unsigned int flags);
+int gpio_get_edge(unsigned int gpio);
 
 /**
  * Higher level API
  */
-extern ugpio_t *ugpio_request_one(unsigned int gpio, unsigned int flags, const char *label);
-extern void ugpio_free(ugpio_t *ctx);
-extern int ugpio_open(ugpio_t *ctx);
-extern void ugpio_close(ugpio_t *ctx);
-extern int ugpio_fd(ugpio_t *ctx);
-extern int ugpio_get_value(ugpio_t *ctx);
-extern int ugpio_set_value(ugpio_t *ctx, int value);
+ugpio_t *ugpio_request_one(unsigned int gpio, unsigned int flags, const char *label);
+void ugpio_free(ugpio_t *ctx);
+int ugpio_open(ugpio_t *ctx);
+void ugpio_close(ugpio_t *ctx);
+int ugpio_fd(ugpio_t *ctx);
+int ugpio_get_value(ugpio_t *ctx);
+int ugpio_set_value(ugpio_t *ctx, int value);
 
 UGPIO_END_DECLS
 
