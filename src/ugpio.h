@@ -42,13 +42,13 @@ UGPIO_BEGIN_DECLS
  */
 struct gpio {
 	/* the GPIO number */
-	unsigned int  gpio;
+	unsigned int gpio;
 	/* GPIO configuration as specified by GPIOF_* */
-	unsigned int  flags;
+	unsigned int flags;
 	/* file descriptor of /sys/class/gpio/gpioXY/value */
 	int fd;
 	/* a literal description string of this GPIO */
-	const char    *label;
+	const char *label;
 };
 typedef struct gpio ugpio_t;
 
