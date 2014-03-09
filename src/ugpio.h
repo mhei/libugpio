@@ -41,25 +41,7 @@ UGPIO_BEGIN_DECLS
 #define GPIOF_DIRECTION_UNKNOWN      (1 << 7)
 #define GPIOF_ALTERABLE_EDGE         (1 << 8)
 
-/**
- * A structure describing a GPIO with configuration.
- */
-struct gpio {
-	/* the GPIO number */
-	unsigned int gpio;
-	/* GPIO configuration as specified by GPIOF_* */
-	unsigned int flags;
-	/* file descriptor of /sys/class/gpio/gpioXY/value */
-	int fd_value;
-	/* file descriptor of /sys/class/gpio/gpioXY/active_low */
-	int fd_active_low;
-	/* file descriptor of /sys/class/gpio/gpioXY/direction */
-	int fd_direction;
-	/* file descriptor of /sys/class/gpio/gpioXY/edge */
-	int fd_edge;
-	/* a literal description string of this GPIO */
-	const char *label;
-};
+struct gpio;
 typedef struct gpio ugpio_t;
 
 /**
