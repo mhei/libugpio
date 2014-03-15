@@ -17,27 +17,72 @@
 #include <ugpio.h>
 #include <ugpio-internal.h>
 
-static int gpio_write_value(const char *pathname, const char *buf, size_t count)
+int gpio_fd_open(const char *format, unsigned int gpio, int flags)
 {
-    int fd;
+    char pathname[255];
+    int rv;
 
-    if ((fd = open(pathname, O_WRONLY)) == -1)
-        return -1;
-
-    if (write(fd, buf, count) != count) {
-        close(fd);
+    rv = snprintf(pathname, sizeof(pathname), format, gpio);
+    if (rv < 0 || rv >= sizeof(pathname)) {
+        errno = ENOMEM;
         return -1;
     }
 
-    return close(fd);
+    return open(pathname, flags | O_NONBLOCK);
 }
 
-static ssize_t gpio_read_value(const char *pathname, char *buf, size_t count)
+ssize_t gpio_fd_read(int fd, void *buf, size_t count)
 {
-    int fd;
-    ssize_t c;
+    ssize_t ret;
+    ssize_t n = 0;
 
-    if ((fd = open(pathname, O_RDONLY)) == -1)
+    if (lseek(fd, 0, SEEK_SET) < 0)
+        return -1;
+
+    do {
+        ret = read(fd, (char *)buf + n, count - n);
+        if (ret < 0) {
+            if (errno == EINTR || errno == EAGAIN || errno == EWOULDBLOCK)
+                continue; /* try again */
+            return -1;
+        }
+        n += ret;
+    } while (n < count && ret);
+
+    return n;
+}
+
+ssize_t gpio_fd_write(int fd, const void *buf, size_t count)
+{
+    ssize_t ret;
+    ssize_t n = 0;
+
+    do {
+        ret = write(fd, (char *)buf + n, count - n);
+        if (ret < 0) {
+            if (errno == EINTR || errno == EAGAIN || errno == EWOULDBLOCK)
+                continue; /* try again */
+            return -1;
+        }
+        n += ret;
+    } while (n < count);
+
+    return n;
+}
+
+ssize_t gpio_read(unsigned int gpio, const char *key, char *buf, size_t count)
+{
+    char pathname[255];
+    ssize_t c;
+    int fd;
+
+    fd = snprintf(pathname, sizeof(pathname), key, gpio);
+    if (fd < 0 || fd >= sizeof(pathname)) {
+        errno = ENOMEM;
+        return -1;
+    }
+
+    if ((fd = open(pathname, O_RDONLY | O_CLOEXEC)) == -1)
         return -1;
 
     if ((c = read(fd, buf, count)) == -1) {
@@ -51,10 +96,33 @@ static ssize_t gpio_read_value(const char *pathname, char *buf, size_t count)
     return c;
 }
 
+int gpio_write(unsigned int gpio, const char *key, const char *buf, size_t count)
+{
+    char pathname[255];
+    int fd;
+
+    fd = snprintf(pathname, sizeof(pathname), key, gpio);
+    if (fd < 0 || fd >= sizeof(pathname)) {
+        errno = ENOMEM;
+        return -1;
+    }
+
+    if ((fd = open(pathname, O_WRONLY)) == -1)
+        return -1;
+
+    if (gpio_fd_write(fd, buf, count) != count) {
+        close(fd);
+        return -1;
+    }
+
+    return close(fd);
+}
+
 static int gpio_check(unsigned int gpio, const char *key)
 {
     int fd;
     char pathname[255];
+
     snprintf(pathname, sizeof(pathname), key, gpio);
 
     fd = open(pathname, O_RDONLY | O_CLOEXEC);
@@ -81,15 +149,19 @@ int gpio_is_requested(unsigned int gpio)
 int gpio_request(unsigned int gpio, const char *label)
 {
     char buffer[16];
+
     snprintf(buffer, sizeof(buffer), "%d\n", gpio);
-    return gpio_write_value(GPIO_EXPORT, buffer, strlen(buffer));
+
+    return gpio_write(-1, GPIO_EXPORT, buffer, strlen(buffer));
 }
 
 int gpio_free(unsigned int gpio)
 {
     char buffer[16];
+
     snprintf(buffer, sizeof(buffer), "%d\n", gpio);
-    return gpio_write_value(GPIO_UNEXPORT, buffer, strlen(buffer));
+
+    return gpio_write(-1, GPIO_UNEXPORT, buffer, strlen(buffer));
 }
 
 int gpio_alterable_direction(unsigned int gpio)
@@ -99,12 +171,9 @@ int gpio_alterable_direction(unsigned int gpio)
 
 int gpio_get_direction(unsigned int gpio)
 {
-    char pathname[255];
     char buffer;
 
-    snprintf(pathname, sizeof(pathname), GPIO_DIRECTION, gpio);
-
-    if (gpio_read_value(pathname, &buffer, sizeof(buffer)) == -1)
+    if (gpio_read(gpio, GPIO_DIRECTION, &buffer, sizeof(buffer)) < 1)
         return -1;
 
     return (buffer == 'i') ? GPIOF_DIR_IN : GPIOF_DIR_OUT;
@@ -112,28 +181,21 @@ int gpio_get_direction(unsigned int gpio)
 
 int gpio_direction_input(unsigned int gpio)
 {
-    char pathname[255];
-    snprintf(pathname, sizeof(pathname), GPIO_DIRECTION, gpio);
-    return gpio_write_value(pathname, "in", 3);
+    return gpio_write(gpio, GPIO_DIRECTION, "in", 3);
 }
 
 int gpio_direction_output(unsigned int gpio, int value)
 {
-    char pathname[255];
-    char *val;
-    snprintf(pathname, sizeof(pathname), GPIO_DIRECTION, gpio);
-    val = value ? "high" : "low";
-    return gpio_write_value(pathname, val, strlen(val) + 1);
+    char *val = value ? "high" : "low";
+
+    return gpio_write(gpio, GPIO_DIRECTION, val, strlen(val) + 1);
 }
 
 int gpio_get_activelow(unsigned int gpio)
 {
-    char pathname[255];
     char buffer;
 
-    snprintf(pathname, sizeof(pathname), GPIO_ACTIVELOW, gpio);
-
-    if (gpio_read_value(pathname, &buffer, sizeof(buffer)) == -1)
+    if (gpio_read(gpio, GPIO_ACTIVELOW, &buffer, sizeof(buffer)) != sizeof(buffer))
         return -1;
 
     return buffer - '0';
@@ -141,19 +203,14 @@ int gpio_get_activelow(unsigned int gpio)
 
 int gpio_set_activelow(unsigned int gpio, int value)
 {
-    char pathname[255];
-    snprintf(pathname, sizeof(pathname), GPIO_ACTIVELOW, gpio);
-    return gpio_write_value(pathname, value ? "1" : "0", 2);
+    return gpio_write(gpio, GPIO_ACTIVELOW, value ? "1" : "0", 2);
 }
 
 int gpio_get_value(unsigned int gpio)
 {
-    char pathname[255];
     char buffer;
 
-    snprintf(pathname, sizeof(pathname), GPIO_VALUE, gpio);
-
-    if (gpio_read_value(pathname, &buffer, sizeof(buffer)) == -1)
+    if (gpio_read(gpio, GPIO_VALUE, &buffer, sizeof(buffer)) != sizeof(buffer))
         return -1;
 
     return buffer - '0';
@@ -161,9 +218,7 @@ int gpio_get_value(unsigned int gpio)
 
 int gpio_set_value(unsigned int gpio, int value)
 {
-    char pathname[255];
-    snprintf(pathname, sizeof(pathname), GPIO_VALUE, gpio);
-    return gpio_write_value(pathname, value ? "1" : "0", 2);
+    return gpio_write(gpio, GPIO_VALUE, value ? "1" : "0", 2);
 }
 
 int gpio_request_one(unsigned int gpio, unsigned int flags, const char *label)
@@ -225,13 +280,6 @@ int gpio_alterable_edge(unsigned int gpio)
     return gpio_check(gpio, GPIO_EDGE);
 }
 
-int gpio_set_edge_str(unsigned int gpio, const char *edge)
-{
-    char pathname[255];
-    snprintf(pathname, sizeof(pathname), GPIO_EDGE, gpio);
-    return gpio_write_value(pathname, edge, strlen(edge) + 1);
-}
-
 static const struct {
     const char *name;
     unsigned int flags;
@@ -250,23 +298,31 @@ int gpio_set_edge(unsigned int gpio, unsigned int flags)
         if ((flags & GPIOF_TRIGGER_MASK) == trigger_types[i].flags)
             break;
 
-    return gpio_set_edge_str(gpio, trigger_types[i].name);
+    if (i >= ARRAY_SIZE(trigger_types)) {
+        errno = EINVAL;
+        return -1;
+    }
+
+    return gpio_write(gpio, GPIO_EDGE, trigger_types[i].name,
+                      strlen(trigger_types[i].name) + 1);
 }
 
 int gpio_get_edge(unsigned int gpio)
 {
-    char pathname[255];
     char buffer[16];
     int i;
 
-    snprintf(pathname, sizeof(pathname), GPIO_EDGE, gpio);
-
-    if (gpio_read_value(pathname, buffer, sizeof(buffer)) == -1)
+    if (gpio_read(gpio, GPIO_EDGE, buffer, sizeof(buffer)) == -1)
         return -1;
 
     for (i = 0; i < ARRAY_SIZE(trigger_types); i++)
         if (strncmp(buffer, trigger_types[i].name, strlen(trigger_types[i].name)) == 0)
              break;
+
+    if (i >= ARRAY_SIZE(trigger_types)) {
+        errno = EFAULT;
+        return -1;
+    }
 
     return trigger_types[i].flags;
 }
