@@ -85,7 +85,7 @@ ssize_t gpio_read(unsigned int gpio, const char *key, char *buf, size_t count)
     if ((fd = open(pathname, O_RDONLY | O_CLOEXEC)) == -1)
         return -1;
 
-    if ((c = read(fd, buf, count)) == -1) {
+    if ((c = gpio_fd_read(fd, buf, count)) == -1) {
         close(fd);
         return -1;
     }
