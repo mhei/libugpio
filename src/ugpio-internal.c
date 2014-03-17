@@ -9,24 +9,31 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <stdio.h>
+#include <string.h>
 #include <errno.h>
 
 #include <config.h>
 #include <ugpio.h>
 #include <ugpio-internal.h>
 
-int gpio_fd_open(const char *format, unsigned int gpio, int flags)
+int gpio_fd_open(unsigned int gpio, const char *key, int flags)
 {
     char pathname[255];
     int rv;
 
-    rv = snprintf(pathname, sizeof(pathname), format, gpio);
+    rv = snprintf(pathname, sizeof(pathname), key, gpio);
     if (rv < 0 || rv >= sizeof(pathname)) {
         errno = ENOMEM;
         return -1;
     }
 
     return open(pathname, flags | O_NONBLOCK);
+}
+
+int gpio_fd_close(int fd)
+{
+    return close(fd);
 }
 
 ssize_t gpio_fd_read(int fd, void *buf, size_t count)
@@ -68,9 +75,51 @@ ssize_t gpio_fd_write(int fd, const void *buf, size_t count)
     return n;
 }
 
-int ugpio_fd_close(int fd)
+static const struct {
+	const char *name;
+	unsigned int flags;
+} ugpio_triggers[] = {
+	{ "none",    0 },
+	{ "falling", GPIOF_TRIG_FALL },
+	{ "rising",  GPIOF_TRIG_RISE },
+	{ "both",    GPIOF_TRIG_FALL | GPIOF_TRIG_RISE },
+};
+
+int gpio_fd_get_edge(int fd)
 {
-    return close(fd);
+    char buffer[16];
+    int i;
+
+    if (gpio_fd_read(fd, buffer, sizeof(buffer)) == -1)
+        return -1;
+
+    for (i = 0; i < ARRAY_SIZE(ugpio_triggers); i++)
+        if (strncmp(buffer, ugpio_triggers[i].name, strlen(ugpio_triggers[i].name)) == 0)
+             break;
+
+    if (i >= ARRAY_SIZE(ugpio_triggers)) {
+        errno = EFAULT;
+        return -1;
+    }
+
+    return ugpio_triggers[i].flags;
+}
+
+int gpio_fd_set_edge(int fd, unsigned int flags)
+{
+    int i;
+
+    for (i = 0; i < ARRAY_SIZE(ugpio_triggers); i++)
+        if ((flags & GPIOF_TRIGGER_MASK) == ugpio_triggers[i].flags)
+            break;
+
+    if (i >= ARRAY_SIZE(ugpio_triggers)) {
+        errno = EINVAL;
+        return -1;
+    }
+
+    return gpio_fd_write(fd, ugpio_triggers[i].name,
+                         strlen(ugpio_triggers[i].name) + 1);
 }
 
 ssize_t gpio_read(unsigned int gpio, const char *key, char *buf, size_t count)

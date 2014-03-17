@@ -58,7 +58,7 @@ void ugpio_free(ugpio_t *ctx)
 
 int ugpio_open(ugpio_t *ctx)
 {
-    ctx->fd_value = ugpio_fd_open(ctx->gpio, ctx->flags & GPIOF_DIR_IN);
+    ctx->fd_value = gpio_fd_open(ctx->gpio, GPIO_VALUE, ctx->flags & GPIOF_DIR_IN);
     return ctx->fd_value;
 }
 
@@ -70,7 +70,7 @@ void ugpio_close(ugpio_t *ctx)
     if (ctx->fd_value == -1)
         return;
 
-    ugpio_fd_close(ctx->fd_value);
+    gpio_fd_close(ctx->fd_value);
     ctx->fd_value = -1;
 }
 

@@ -156,49 +156,30 @@ int gpio_alterable_edge(unsigned int gpio)
     return gpio_check(gpio, GPIO_EDGE);
 }
 
-static const struct {
-    const char *name;
-    unsigned int flags;
-} trigger_types[] = {
-    { "none",    0 },
-    { "falling", GPIOF_TRIG_FALL },
-    { "rising",  GPIOF_TRIG_RISE },
-    { "both",    GPIOF_TRIG_FALL | GPIOF_TRIG_RISE },
-};
-
 int gpio_set_edge(unsigned int gpio, unsigned int flags)
 {
-    int i;
+    int fd, rv;
 
-    for (i = 0; i < ARRAY_SIZE(trigger_types); i++)
-        if ((flags & GPIOF_TRIGGER_MASK) == trigger_types[i].flags)
-            break;
-
-    if (i >= ARRAY_SIZE(trigger_types)) {
-        errno = EINVAL;
+    if ((fd = gpio_fd_open(gpio, GPIO_EDGE, O_WRONLY | O_CLOEXEC)) == -1)
         return -1;
-    }
 
-    return gpio_write(gpio, GPIO_EDGE, trigger_types[i].name,
-                      strlen(trigger_types[i].name) + 1);
+    rv = gpio_fd_set_edge(fd, flags);
+
+    close(fd);
+
+    return rv;
 }
 
 int gpio_get_edge(unsigned int gpio)
 {
-    char buffer[16];
-    int i;
+    int fd, rv;
 
-    if (gpio_read(gpio, GPIO_EDGE, buffer, sizeof(buffer)) == -1)
+    if ((fd = gpio_fd_open(gpio, GPIO_EDGE, O_RDONLY | O_CLOEXEC)) == -1)
         return -1;
 
-    for (i = 0; i < ARRAY_SIZE(trigger_types); i++)
-        if (strncmp(buffer, trigger_types[i].name, strlen(trigger_types[i].name)) == 0)
-             break;
+    rv = gpio_fd_get_edge(fd);
 
-    if (i >= ARRAY_SIZE(trigger_types)) {
-        errno = EFAULT;
-        return -1;
-    }
+    close(fd);
 
-    return trigger_types[i].flags;
+    return rv;
 }
