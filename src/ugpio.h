@@ -250,7 +250,9 @@ int ugpio_alterable_edge(ugpio_t *ctx);
  *
  * @param ctx a GPIO context
  * @return 0 or one or more GPIOF_TRIG_* or-ed together, -1 on error
- *         with errno set appropriately
+ *         with errno set appropriately:
+ *         EFAULT - the flag string found could not be mappend to the
+ *         library flags.
  */
 int ugpio_get_edge(ugpio_t *ctx);
 
@@ -260,7 +262,8 @@ int ugpio_get_edge(ugpio_t *ctx);
  * @param ctx a GPIO context
  * @param flags the flag to set: 0 or one or more GPIOF_TRIG_* flags
  *        or-ed together
- * @return 0 on success, -1 on error with errno set appropriately
+ * @return 0 on success, -1 on error with errno set appropriately:
+ *         EINVAL - the flags could not be mapped to any known flag string.
  */
 int ugpio_set_edge(ugpio_t *ctx, int flags);
 
