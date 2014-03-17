@@ -119,6 +119,7 @@ void ugpio_free(ugpio_t *ctx);
  * This opens /sys/class/gpio/gpioXY/value file, but not the other file handles.
  *
  * @param ctx a GPIO context
+ * @return returns the opened file descriptor, -1 on error.
  */
 int ugpio_open(ugpio_t *ctx);
 
@@ -129,6 +130,7 @@ int ugpio_open(ugpio_t *ctx);
  * when you drop privileges later and want still be able to re-configure everything then.
  *
  * @param ctx a GPIO context
+ * @return 0 on success, -1 on error with errno set appropriately
  */
 int ugpio_full_open(ugpio_t *ctx);
 
