@@ -9,6 +9,7 @@ libugpio_la_SOURCES = \
         ugpio.c \
         gpio.c \
         ugpio.h \
+        ugpio-internal.c \
         ugpio-internal.h \
         ugpio-version.h
 

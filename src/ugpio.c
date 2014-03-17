@@ -15,19 +15,6 @@
 #include <ugpio.h>
 #include <ugpio-internal.h>
 
-static int ugpio_fd_open(unsigned int gpio, int ro)
-{
-    char pathname[255];
-    snprintf(pathname, sizeof(pathname), GPIO_VALUE, gpio);
-
-    return open(pathname, (ro ? O_RDONLY : O_RDWR) | O_NONBLOCK);
-}
-
-static int ugpio_fd_close(int fd)
-{
-    return close(fd);
-}
-
 ugpio_t *ugpio_request_one(unsigned int gpio, unsigned int flags, const char *label)
 {
     ugpio_t *ctx;
