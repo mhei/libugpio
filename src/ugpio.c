@@ -10,10 +10,62 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <config.h>
 #include <ugpio.h>
 #include <ugpio-internal.h>
+
+ugpio_t *ugpio_request(unsigned int gpio, const char *label)
+{
+    ugpio_t *ctx;
+    int is_requested, val;
+
+    if ((ctx = malloc(sizeof(*ctx))) == NULL)
+        return NULL;
+
+    ctx->gpio = gpio;
+    ctx->flags = GPIOF_CLOEXEC | GPIOF_DIRECTION_UNKNOWN;
+    ctx->label = label;
+    ctx->fd_value = -1;
+    ctx->fd_active_low = -1;
+    ctx->fd_direction = -1;
+    ctx->fd_edge = -1;
+
+    if ((is_requested = gpio_is_requested(ctx->gpio)) < 0)
+        goto error_free;
+
+    if (!is_requested) {
+        if (gpio_request(ctx->gpio, ctx->label) < 0)
+            goto error_free;
+
+        ctx->flags |= GPIOF_REQUESTED;
+    }
+
+    if (gpio_alterable_direction(ctx->gpio)) {
+        ctx->flags |= GPIOF_ALTERABLE_DIRECTION;
+
+        if ((val = gpio_get_direction(ctx->gpio)) != -1) {
+            ctx->flags &= ~GPIOF_DIRECTION_UNKNOWN;
+            ctx->flags |= val;
+        }
+    }
+
+    if (gpio_alterable_edge(ctx->gpio)) {
+        ctx->flags |= GPIOF_ALTERABLE_EDGE;
+
+        if ((val = gpio_get_edge(ctx->gpio)) != -1) {
+            ctx->flags &= ~GPIOF_TRIGGER_MASK;
+            ctx->flags |= val;
+        }
+    }
+
+    return ctx;
+
+error_free:
+    free(ctx);
+    return NULL;
+}
 
 ugpio_t *ugpio_request_one(unsigned int gpio, unsigned int flags, const char *label)
 {
@@ -162,7 +214,7 @@ int ugpio_get_activelow(ugpio_t *ctx)
     return buffer - '0';
 }
 
-int ugpio_set_active(ugpio_t *ctx, int value)
+int ugpio_set_activelow(ugpio_t *ctx, int value)
 {
     ssize_t c;
 
@@ -171,8 +223,55 @@ int ugpio_set_active(ugpio_t *ctx, int value)
     return (c != 2) ? -1 : 0;
 }
 
+int ugpio_alterable_direction(ugpio_t *ctx)
+{
+    return !!(ctx->flags & GPIOF_ALTERABLE_DIRECTION);
+}
+
+int ugpio_get_direction(ugpio_t *ctx)
+{
+    char buffer;
+
+    if (gpio_fd_read(ctx->fd_direction, &buffer, sizeof(buffer)) < sizeof(buffer))
+        return -1;
+
+    return (buffer == 'i') ? GPIOF_DIR_IN : GPIOF_DIR_OUT;
+}
+
+int ugpio_direction_input(ugpio_t *ctx)
+{
+    if (gpio_fd_write(ctx->fd_direction, "in", 3) < 0)
+        return -1;
+
+    if (fcntl(ctx->fd_value, F_SETFL, O_RDONLY) < 0)
+        return -1;
+
+    ctx->flags &= ~GPIOF_DIRECTION_UNKNOWN;
+    ctx->flags |= GPIOF_DIR_IN;
+}
+
+int ugpio_direction_output(ugpio_t *ctx, int value)
+{
+    char *val = value ? "high" : "low";
+
+    if (gpio_fd_write(ctx->fd_direction, val, strlen(val) + 1) < 0)
+        return -1;
+
+    if (fcntl(ctx->fd_value, F_SETFL, O_RDWR) < 0)
+        return -1;
+
+    ctx->flags &= ~GPIOF_DIR_IN;
+    return 0;
+}
+
+int ugpio_alterable_edge(ugpio_t *ctx)
+{
+    return !!(ctx->flags & GPIOF_ALTERABLE_EDGE);
+}
+
 int ugpio_get_edge(ugpio_t *ctx)
 {
+
     return gpio_fd_get_edge(ctx->fd_edge);
 }
 
