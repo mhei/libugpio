@@ -126,7 +126,7 @@ int ugpio_open(ugpio_t *ctx);
 /**
  * Open the GPIO.
  *
- * This opens all files of the GPIO (/sys/class/gpio/gpioXY/*). Use this function e.g.
+ * This opens all files of the GPIO (/sys/class/gpio/gpioXY/...). Use this function e.g.
  * when you drop privileges later and want still be able to re-configure everything then.
  *
  * @param ctx a GPIO context
