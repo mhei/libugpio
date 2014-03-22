@@ -248,6 +248,7 @@ int ugpio_direction_input(ugpio_t *ctx)
 
     ctx->flags &= ~GPIOF_DIRECTION_UNKNOWN;
     ctx->flags |= GPIOF_DIR_IN;
+    return 0;
 }
 
 int ugpio_direction_output(ugpio_t *ctx, int value)
