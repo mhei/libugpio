@@ -146,7 +146,7 @@ int ugpio_full_open(ugpio_t *ctx)
     if (ctx->fd_direction == -1)
         return -1;
 
-    if (ctx->fd_edge == -1)
+    if (ctx->fd_edge == -1 && ctx->flags & GPIOF_ALTERABLE_EDGE)
         ctx->fd_edge = gpio_fd_open(ctx->gpio, GPIO_EDGE, flags);
     if (ctx->fd_edge == -1)
         return -1;
