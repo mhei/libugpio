@@ -100,10 +100,15 @@ int gpio_set_value(unsigned int gpio, int value)
 int gpio_request_one(unsigned int gpio, unsigned int flags, const char *label)
 {
     int rv;
+    int is_requested;
 
-    rv = gpio_request(gpio, label);
-    if (rv)
-        return rv;
+    if ((is_requested = gpio_is_requested(gpio)) < 0)
+        return -1;
+
+    if (!is_requested) {
+        if (gpio_request(gpio, label) < 0)
+            return -1;
+    }
 
     if (flags & GPIOF_DIR_IN)
         rv = gpio_direction_input(gpio);
@@ -120,10 +125,13 @@ int gpio_request_one(unsigned int gpio, unsigned int flags, const char *label)
         rv = gpio_set_edge(gpio, flags);
 
   err_free:
-    if (rv)
-        gpio_free(gpio);
+    if (rv < 0) {
+        if (!is_requested)
+            gpio_free(gpio);
+        return -1;
+    }
 
-    return rv;
+    return !is_requested;
 }
 
 int gpio_request_array(const struct gpio *array, size_t num)
@@ -132,7 +140,7 @@ int gpio_request_array(const struct gpio *array, size_t num)
 
     for (i = 0; i < num; i++, array++) {
         err = gpio_request_one(array->gpio, array->flags, array->label);
-        if (err)
+        if (err < 0)
             goto err_free;
     }
 

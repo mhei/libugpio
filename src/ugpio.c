@@ -86,12 +86,11 @@ ugpio_t *ugpio_request_one(unsigned int gpio, unsigned int flags, const char *la
     if ((is_requested = gpio_is_requested(ctx->gpio)) < 0)
         goto error_free;
 
-    if (!is_requested) {
-        if (gpio_request_one(ctx->gpio, ctx->flags, ctx->label) < 0)
-            goto error_free;
-
+    is_requested = gpio_request_one(ctx->gpio, ctx->flags, ctx->label);
+    if (is_requested < 0)
+        goto error_free;
+    else if (is_requested)
         ctx->flags |= GPIOF_REQUESTED;
-    }
 
     return ctx;
 
