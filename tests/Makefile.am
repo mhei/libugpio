@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0+
 #
 
-INCLUDES                = -I$(top_srcdir)/src
+INCLUDES                = -I$(top_srcdir)/src -I$(top_builddir)/src
 
 bin_PROGRAMS            = gpioctl
 
