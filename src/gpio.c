@@ -89,7 +89,7 @@ int gpio_get_value(unsigned int gpio)
     if (gpio_read(gpio, GPIO_VALUE, &buffer, sizeof(buffer)) != sizeof(buffer))
         return -1;
 
-    return buffer - '0';
+    return !!(buffer - '0');
 }
 
 int gpio_set_value(unsigned int gpio, int value)

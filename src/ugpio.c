@@ -191,7 +191,7 @@ int ugpio_get_value(ugpio_t *ctx)
     if (gpio_fd_read(ctx->fd_value, &buffer, sizeof(buffer)) < sizeof(buffer))
         return -1;
 
-    return buffer - '0';
+    return !!(buffer - '0');
 }
 
 int ugpio_set_value(ugpio_t *ctx, int value)
