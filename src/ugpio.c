@@ -135,20 +135,26 @@ int ugpio_full_open(ugpio_t *ctx)
     flags  = O_RDWR;
     flags |= (ctx->flags & GPIOF_CLOEXEC) ? O_CLOEXEC : 0;
 
-    if (ctx->fd_active_low == -1)
+    if (ctx->fd_active_low == -1) {
         ctx->fd_active_low = gpio_fd_open(ctx->gpio, GPIO_ACTIVELOW, flags);
-    if (ctx->fd_active_low == -1)
-        return -1;
+        if (ctx->fd_active_low == -1) {
+            return -1;
+        }
+    }
 
-    if (ctx->fd_direction == -1 && ctx->flags & GPIOF_ALTERABLE_DIRECTION)
+    if (ctx->fd_direction == -1 && ctx->flags & GPIOF_ALTERABLE_DIRECTION) {
         ctx->fd_direction = gpio_fd_open(ctx->gpio, GPIO_DIRECTION, flags);
-    if (ctx->fd_direction == -1)
-        return -1;
+        if (ctx->fd_direction == -1) {
+            return -1;
+        }
+    }
 
-    if (ctx->fd_edge == -1 && ctx->flags & GPIOF_ALTERABLE_EDGE)
+    if (ctx->fd_edge == -1 && ctx->flags & GPIOF_ALTERABLE_EDGE) {
         ctx->fd_edge = gpio_fd_open(ctx->gpio, GPIO_EDGE, flags);
-    if (ctx->fd_edge == -1)
-        return -1;
+        if (ctx->fd_edge == -1) {
+            return -1;
+        }
+    }
 
     return 0;
 }
