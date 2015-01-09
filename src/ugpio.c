@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: LGPL-2.1+
  */
 
+#define _GNU_SOURCE
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
