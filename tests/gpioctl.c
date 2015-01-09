@@ -22,7 +22,7 @@ void print_usage(void)
 int main(int argc, char *argv[])
 {
 	unsigned int gpio_pin;
-	int rq, al, rv;
+	int rq, al, rv = -1;
 
 	if (argc != 3)
 	{
