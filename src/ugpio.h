@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: LGPL-2.1+
  */
 
-#ifndef _UGPIO_H_
-#define _UGPIO_H_
+#ifndef UGPIO_H
+#define UGPIO_H
 
 #include <stddef.h>
 #include "ugpio-version.h"
@@ -271,4 +271,4 @@ int ugpio_set_edge(ugpio_t *ctx, int flags);
 
 UGPIO_END_DECLS
 
-#endif  /* _UGPIO_H_ */
+#endif  /* UGPIO_H */

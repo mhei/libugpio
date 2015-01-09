@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: LGPL-2.1+
  */
 
-#ifndef _UGPIO_INTERNAL_H_
-#define _UGPIO_INTERNAL_H_
+#ifndef UGPIO_INTERNAL_H
+#define UGPIO_INTERNAL_H
 
 #ifndef ARRAY_SIZE
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
@@ -53,4 +53,4 @@ ssize_t gpio_read(unsigned int gpio, const char *key, char *buf, size_t count);
 int gpio_write(unsigned int gpio, const char *key, const char *buf, size_t count);
 int gpio_check(unsigned int gpio, const char *key);
 
-#endif  /* _UGPIO_INTERNAL_H_ */
+#endif  /* UGPIO_INTERNAL_H */

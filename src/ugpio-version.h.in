@@ -16,8 +16,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef _UGPIO_VERSION_H_
-#define _UGPIO_VERSION_H_
+#ifndef UGPIO_VERSION_H
+#define UGPIO_VERSION_H
 
 /* The major version, (1, if %LIBUGPIO_VERSION is 1.2.3) */
 #define LIBUGPIO_VERSION_MAJOR (@LIBUGPIO_VERSION_MAJOR@)
@@ -48,4 +48,4 @@
       LIBUGPIO_VERSION_MINOR == (minor) &&             \
       LIBUGPIO_VERSION_MICRO >= (micro)))
 
-#endif /* _UGPIO_VERSION_H_ */
+#endif /* UGPIO_VERSION_H */
