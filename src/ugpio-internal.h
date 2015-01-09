@@ -23,20 +23,20 @@
  * A structure describing a GPIO with configuration.
  */
 struct gpio {
-	/* the GPIO number */
-	unsigned int gpio;
-	/* GPIO configuration as specified by GPIOF_* */
-	unsigned int flags;
-	/* file descriptor of /sys/class/gpio/gpioXY/value */
-	int fd_value;
-	/* file descriptor of /sys/class/gpio/gpioXY/active_low */
-	int fd_active_low;
-	/* file descriptor of /sys/class/gpio/gpioXY/direction */
-	int fd_direction;
-	/* file descriptor of /sys/class/gpio/gpioXY/edge */
-	int fd_edge;
-	/* a literal description string of this GPIO */
-	const char *label;
+    /* the GPIO number */
+    unsigned int gpio;
+    /* GPIO configuration as specified by GPIOF_* */
+    unsigned int flags;
+    /* file descriptor of /sys/class/gpio/gpioXY/value */
+    int fd_value;
+    /* file descriptor of /sys/class/gpio/gpioXY/active_low */
+    int fd_active_low;
+    /* file descriptor of /sys/class/gpio/gpioXY/direction */
+    int fd_direction;
+    /* file descriptor of /sys/class/gpio/gpioXY/edge */
+    int fd_edge;
+    /* a literal description string of this GPIO */
+    const char *label;
 };
 
 /**

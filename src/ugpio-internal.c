@@ -76,13 +76,13 @@ ssize_t gpio_fd_write(int fd, const void *buf, size_t count)
 }
 
 static const struct {
-	const char *name;
-	unsigned int flags;
+    const char *name;
+    unsigned int flags;
 } ugpio_triggers[] = {
-	{ "none",    0 },
-	{ "falling", GPIOF_TRIG_FALL },
-	{ "rising",  GPIOF_TRIG_RISE },
-	{ "both",    GPIOF_TRIG_FALL | GPIOF_TRIG_RISE },
+    { "none",    0 },
+    { "falling", GPIOF_TRIG_FALL },
+    { "rising",  GPIOF_TRIG_RISE },
+    { "both",    GPIOF_TRIG_FALL | GPIOF_TRIG_RISE },
 };
 
 int gpio_fd_get_edge(int fd)
