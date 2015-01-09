@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 Michael Heimpold <mhei@heimpold.de>
+ * Copyright © 2015 Michael Heimpold <mhei@heimpold.de>
  *
  * SPDX-License-Identifier: LGPL-2.1+
  */
