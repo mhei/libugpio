@@ -6,6 +6,8 @@
 
 INCLUDES                = -I$(top_srcdir)/src -I$(top_builddir)/src
 
+AM_CFLAGS = -Wall -pedantic
+
 bin_PROGRAMS            = gpioctl
 
 gpioctl_SOURCES         = gpioctl.c

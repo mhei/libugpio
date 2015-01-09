@@ -4,6 +4,8 @@
 # SPDX-License-Identifier: LGPL-2.1+
 #
 
+AM_CFLAGS = -Wall -pedantic
+
 lib_LTLIBRARIES = libugpio.la
 libugpio_la_SOURCES = \
         ugpio.c \
