@@ -249,9 +249,6 @@ int ugpio_direction_input(ugpio_t *ctx)
     if (gpio_fd_write(ctx->fd_direction, "in", 3) < 0)
         return -1;
 
-    if (fcntl(ctx->fd_value, F_SETFL, O_RDONLY) < 0)
-        return -1;
-
     ctx->flags &= ~GPIOF_DIRECTION_UNKNOWN;
     ctx->flags |= GPIOF_DIR_IN;
     return 0;
@@ -262,9 +259,6 @@ int ugpio_direction_output(ugpio_t *ctx, int value)
     char *val = value ? "high" : "low";
 
     if (gpio_fd_write(ctx->fd_direction, val, strlen(val) + 1) < 0)
-        return -1;
-
-    if (fcntl(ctx->fd_value, F_SETFL, O_RDWR) < 0)
         return -1;
 
     ctx->flags &= ~GPIOF_DIR_IN;
