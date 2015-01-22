@@ -4,4 +4,4 @@ compiler:
   - gcc
   - clang
 
-script: ./configure && make
+script: ./autogen.sh && ./configure && make
