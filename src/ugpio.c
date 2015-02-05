@@ -118,7 +118,7 @@ int ugpio_open(ugpio_t *ctx)
     if (ctx->fd_value != -1)
         return ctx->fd_value;
 
-    flags  = (ctx->flags & GPIOF_DIR_IN) ? O_RDONLY : O_RDWR;
+    flags  = O_RDWR;
     flags |= (ctx->flags & GPIOF_CLOEXEC) ? O_CLOEXEC : 0;
 
     ctx->fd_value = gpio_fd_open(ctx->gpio, GPIO_VALUE, flags);
