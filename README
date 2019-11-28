@@ -1,7 +1,7 @@
 Overview
 --------
 
-libugpio is a free software library to ease the use of linux kernel's sysfs
+libugpio is a free software library to ease the use of Linux kernel's sysfs
 gpio interface from C programs and/or other libraries. The basic function
 set is derived from the kernel internal gpio api.
 
