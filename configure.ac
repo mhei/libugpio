@@ -16,9 +16,6 @@ m4_define([libugpio_version_major], [0])
 m4_define([libugpio_version_minor], [0])
 m4_define([libugpio_version_micro], [6])
 
-m4_define([libugpio_release_status],
-    [m4_if(m4_eval(libugpio_version_minor % 2), [1], [snapshot], [release])])
-
 m4_define([libugpio_version],
     [libugpio_version_major.libugpio_version_minor.libugpio_version_micro])
 
