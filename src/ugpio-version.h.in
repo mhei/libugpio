@@ -39,7 +39,7 @@
                               (LIBUGPIO_MINOR_VERSION <<  8) |   \
                               (LIBUGPIO_MICRO_VERSION <<  0))
 
-/* Evaluates to True if the version is greater than @major, @minor and @micro */
+/* Evaluates to True if the version is greater than or equal to @major, @minor and @micro */
 #define LIBUGPIO_VERSION_CHECK(major,minor,micro)      \
     (LIBUGPIO_VERSION_MAJOR > (major) ||               \
      (LIBUGPIO_VERSION_MAJOR == (major) &&             \
