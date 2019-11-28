@@ -14,7 +14,7 @@ dnl http://www.gnu.org/software/libtool/manual/html_node/Libtool-versioning.html
 dnl
 m4_define([libugpio_version_major], [0])
 m4_define([libugpio_version_minor], [0])
-m4_define([libugpio_version_micro], [6])
+m4_define([libugpio_version_micro], [7])
 
 m4_define([libugpio_version],
     [libugpio_version_major.libugpio_version_minor.libugpio_version_micro])
