@@ -8,15 +8,6 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
 
-dnl libugpio package version number, (as distinct from shared library version)
-dnl An odd micro number indicates in-progress development from Git
-dnl An even micro number indicates a released version
-dnl
-dnl Making a point release:
-dnl - increase libugpio_version_micro to the next even number
-dnl
-dnl After the release:
-dnl - increase libugpio_version_minor to the next odd number
 dnl
 dnl Take care to update the libtool versioning when required (LIBUGPIO_LD_*).
 dnl http://www.gnu.org/software/libtool/manual/html_node/Libtool-versioning.html
