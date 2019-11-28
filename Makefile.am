@@ -4,6 +4,8 @@
 # SPDX-License-Identifier: LGPL-2.1-or-later
 #
 
+ACLOCAL_AMFLAGS = -I m4
+
 SUBDIRS		= src tests
 EXTRA_DIST	= autogen.sh autogen-clean.sh
 
