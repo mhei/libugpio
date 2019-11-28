@@ -5,8 +5,8 @@ libugpio is a free software library to ease the use of linux kernel's sysfs
 gpio interface from C programs and/or other libraries. The basic function
 set is derived from the kernel internal gpio api.
 
-The license of libugpio is LGPL v2.1+ and the licence of programs in
-tests directory is GPL v3.0+.
+The license of libugpio is LGPL v2.1 or later and the licence of programs in
+tests directory is GPL v3.0 or later.
 
 The documentation is available under the Creative Commons Attribution-ShareAlike
 License 3.0 (Unported) (http://creativecommons.org/licenses/by-sa/3.0/).

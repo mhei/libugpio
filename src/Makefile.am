@@ -1,7 +1,7 @@
 #
-# Copyright © 2012-2015 Michael Heimpold <mhei@heimpold.de>
+# Copyright © 2012-2019 Michael Heimpold <mhei@heimpold.de>
 #
-# SPDX-License-Identifier: LGPL-2.1+
+# SPDX-License-Identifier: LGPL-2.1-or-later
 #
 
 AM_CFLAGS = -Wall -pedantic

@@ -1,7 +1,7 @@
 dnl
-dnl Copyright © 2012-2015 Michael Heimpold <mhei@heimpold.de>
+dnl Copyright © 2012-2019 Michael Heimpold <mhei@heimpold.de>
 dnl
-dnl SPDX-License-Identifier: LGPL-2.1+
+dnl SPDX-License-Identifier: LGPL-2.1-or-later
 dnl
 
 dnl

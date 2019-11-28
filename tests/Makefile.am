@@ -1,7 +1,7 @@
 #
-# Copyright © 2012-2015 Michael Heimpold <mhei@heimpold.de>
+# Copyright © 2012-2019 Michael Heimpold <mhei@heimpold.de>
 #
-# SPDX-License-Identifier: GPL-3.0+
+# SPDX-License-Identifier: GPL-3.0-or-later
 #
 
 INCLUDES                = -I$(top_srcdir)/src -I$(top_builddir)/src
