@@ -34,10 +34,10 @@
 /* The full version, in string form (suited for string concatenation) */
 #define LIBUGPIO_VERSION_STRING "@LIBUGPIO_VERSION@"
 
-/* Numerically encoded version, like 0x010203 */
-#define LIBUGPIO_VERSION_HEX ((LIBUGPIO_MAJOR_VERSION << 24) |   \
-                              (LIBUGPIO_MINOR_VERSION << 16) |   \
-                              (LIBUGPIO_MICRO_VERSION << 8))
+/* Numerically encoded version, e.g. v1.2.3 is 0x010203 */
+#define LIBUGPIO_VERSION_HEX ((LIBUGPIO_MAJOR_VERSION << 16) |   \
+                              (LIBUGPIO_MINOR_VERSION <<  8) |   \
+                              (LIBUGPIO_MICRO_VERSION <<  0))
 
 /* Evaluates to True if the version is greater than @major, @minor and @micro */
 #define LIBUGPIO_VERSION_CHECK(major,minor,micro)      \
